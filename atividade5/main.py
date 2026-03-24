@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup as BS
 from urllib import request
-import csv
+
 
 page = request.urlopen('https://exa-618-xi.vercel.app/atividade1')
 html = str(page.read().decode('utf-8'))
@@ -16,17 +16,22 @@ with open("atividade5/seeds.txt","r",encoding="UTF-8") as seeds:
     for pageS in seeds:
         page = request.urlopen(pageS)
         html = str(page.read().decode('utf-8'))
-        soup = BS(html, 'html.parser')
+        soup = BS(html, 'html.parser')  
 
         titulo = soup.title.string
         print("Na pagina:", titulo)
         imgs = []
         for img in soup.find_all('img'):
-            colecao.append([titulo,img.attrs.get("src")])
-            break
-# write_html.py
+            link = img.attrs.get("src")
+            if ('https' or 'data:image') in link:
+                colecao.append([titulo,img.attrs.get("src")])
+                break
+            else:
+                print("Link antes mudança:",link)
+                link = pageS+link.replace("./",".../")
+                print("link pós mudança:",link)
+                break
 
-# 1. Store HTML in a multi-line string using triple quotes
 message = """
 <!DOCTYPE html>
 <html lang="pt-br">
