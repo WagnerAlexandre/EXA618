@@ -11,25 +11,28 @@ for img in soup.find_all('img'):
 
 colecao = []
 
-with open("atividade5/seeds.txt","r",encoding="UTF-8") as seeds:
+with open("atividade5/seeds.txt","r", encoding="UTF-8") as seeds:
     
     for pageS in seeds:
         page = request.urlopen(pageS)
         html = str(page.read().decode('utf-8'))
         soup = BS(html, 'html.parser')  
-
         titulo = soup.title.string
-        print("Na pagina:", titulo)
+        print("Entrando no link:",pageS)
+        print("Referente:",titulo)
+
         imgs = []
         for img in soup.find_all('img'):
             link = img.attrs.get("src")
-            if ('https' or 'data:image') in link:
+            if 'https'in link or 'data:image' in link:
                 colecao.append([titulo,img.attrs.get("src")])
                 break
             else:
-                print("Link antes mudança:",link)
-                link = pageS+link.replace("./",".../")
-                print("link pós mudança:",link)
+
+                link = link.replace("./","").replace("../","").replace(".../","").replace("//","").replace("/.","").replace("/atividade1","")
+                link = pageS.replace("index.html","")+'/'+link
+
+                colecao.append([titulo,link])
                 break
 
 message = """
@@ -43,11 +46,12 @@ message = """
 <body>
 """
 for i in colecao:
-   message += f"""<h1>{i[0]}</h1>
-    <img src="{i[1]}"> </div>
+   message += f"""
+   <h1>{i[0]}</h1>
+   <img src="{i[1]}"> </div>
     """
 message += "</body> </html>"
 
 
-with open("atividade5/index.html", "w") as f:
+with open("atividade5/index.html", "w", encoding='utf-8') as f:
     f.write(message)
