@@ -14,8 +14,15 @@ FILENAME = "dados.csv"
 class handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
-        # Rota: /api/atividade7/mensagens
-        if self.path == '/api/atividade7/mensagens':
+        # Rota principal pedida: /api/index
+        if self.path == '/api/index':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/plain; charset=utf-8')
+            self.end_headers()
+            self.wfile.write("API Atividade 7 via /api/index está Online!".encode('utf-8'))
+
+        # Rota de listagem: /api/index/mensagens ou /api/atividade7/mensagens
+        elif '/mensagens' in self.path:
             file_url = f"{BASE_URL}/{FILENAME}"
             try:
                 res = requests.get(file_url)
@@ -31,25 +38,17 @@ class handler(BaseHTTPRequestHandler):
                     response = {"mensagens": list(reader)}
                 
                 self.wfile.write(json.dumps(response).encode('utf-8'))
-
             except Exception as e:
                 self.enviar_erro(str(e))
-
-        # Rota: /api/atividade7
-        elif self.path == '/api/atividade7':
-            self.send_response(200)
-            self.send_header('Content-type', 'text/plain')
-            self.end_headers()
-            self.wfile.write("API Atividade 7 Online (BaseHTTPRequestHandler)!".encode('utf-8'))
         
         else:
-            self.enviar_erro("Rota nao encontrada", 404)
+            self.enviar_erro(f"Rota {self.path} nao encontrada", 404)
 
     def do_POST(self):
-        # Rota: /api/atividade7/salvar
-        if self.path == '/api/atividade7/salvar':
+        # Rota de salvamento
+        if '/salvar' in self.path:
             try:
-                content_length = int(self.headers['Content-Length'])
+                content_length = int(self.headers.get('Content-Length', 0))
                 post_data = self.rfile.read(content_length)
                 data_json = json.loads(post_data)
 
@@ -57,15 +56,13 @@ class handler(BaseHTTPRequestHandler):
                 msg = data_json.get('mensagem', '')
                 timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-                # 1. Busca conteúdo atual
+                # Busca o CSV atual para anexar
                 res = requests.get(f"{BASE_URL}/{FILENAME}")
                 conteudo = res.text if res.status_code == 200 else "Data,Usuario,Mensagem\n"
-                
-                # 2. Prepara novo CSV
                 novo_conteudo = conteudo + f"{timestamp},{usuario},{msg}\n"
 
-                # 3. Envia para o Blob
-                blob_res = requests.put(
+                # Upload para o Vercel Blob
+                requests.put(
                     f"https://blob.vercel-storage.com/{FILENAME}",
                     data=novo_conteudo.encode('utf-8'),
                     headers={
@@ -83,7 +80,7 @@ class handler(BaseHTTPRequestHandler):
             except Exception as e:
                 self.enviar_erro(str(e))
         else:
-            self.enviar_erro("Rota nao encontrada", 404)
+            self.enviar_erro("Rota de postagem nao encontrada", 404)
 
     def enviar_erro(self, mensagem, código=500):
         self.send_response(código)
