@@ -1,13 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/atividade7/mensagens",
-      "destination": "/caminho/do/seu/arquivo.py"
+      "source": "/atividade7/(.*)",
+      "destination": "/atividade7/api/index.py"
     }
-  ],
-  "functions": {
-    "**/*.py": {
-      "runtime": "vercel-python@0.0.6"
-    }
-  }
+  ]
 }
