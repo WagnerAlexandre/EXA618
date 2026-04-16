@@ -1,18 +1,18 @@
 from flask import Flask, request, jsonify
 import requests
-import os
+import os, csv, io
 import datetime
-import csv
-import io
 
 app = Flask(__name__)
 
 
 BLOB_TOKEN = os.environ.get("BLOB_READ_WRITE_TOKEN")
 BASE_URL = "https://mvnwxuxouhsw7d1h.public.blob.vercel-storage.com"
-FILENAME = "mensagens.csv"
+FILENAME = "dados.csv"
 
-@app.route('/atividade7/')
+
+
+@app.route('/atividade7')
 def home():
     return "API Atividade 7 Online!"
 
@@ -93,3 +93,6 @@ def listar():
 
 def handler(event, context):
     return app(event, context)
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')
