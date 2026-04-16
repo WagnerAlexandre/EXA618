@@ -46,12 +46,12 @@ def app(environ, start_response):
             msg = data_json.get('mensagem', '')
             timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-            # Busca CSV atual
+  
             res = requests.get(f"{BASE_URL}/{FILENAME}")
             conteudo = res.text if res.status_code == 200 else "Data,Usuario,Mensagem\n"
             novo_conteudo = conteudo + f"{timestamp},{usuario},{msg}\n"
 
-            # Envia para o Blob
+
             requests.put(
                 f"https://blob.vercel-storage.com/{FILENAME}",
                 data=novo_conteudo.encode('utf-8'),
@@ -68,7 +68,6 @@ def app(environ, start_response):
         status = '404 Not Found'
         response_body = json.dumps({"erro": "Rota nao encontrada", "path": path})
 
-    # Configura os headers de resposta
     response_headers = [
         ('Content-Type', 'application/json'),
         ('Content-Length', str(len(response_body)))
