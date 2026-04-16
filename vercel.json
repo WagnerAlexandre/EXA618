@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/atividade7/(.*)",
+      "destination": "/atividade7/api/index.py"
+    }
+  ]
+}
