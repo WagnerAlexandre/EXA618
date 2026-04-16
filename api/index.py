@@ -36,41 +36,39 @@ class handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         # Rota de salvamento
-        if '/salvar' in self.path:
-            try:
-                content_length = int(self.headers.get('Content-Length', 0))
-                post_data = self.rfile.read(content_length)
-                data_json = json.loads(post_data)
+        try:
+            content_length = int(self.headers.get('Content-Length', 0))
+            post_data = self.rfile.read(content_length)
+            data_json = json.loads(post_data)
 
-                usuario = data_json.get('usuario', 'Anônimo')
-                msg = data_json.get('mensagem', '')
-                timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            usuario = data_json.get('usuario', 'Anônimo')
+            msg = data_json.get('mensagem', '')
+            timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-                # Busca o CSV atual para anexar
-                res = requests.get(f"{BASE_URL}/{FILENAME}")
-                conteudo = res.text if res.status_code == 200 else "Data,Usuario,Mensagem\n"
-                novo_conteudo = conteudo + f"{timestamp},{usuario},{msg}\n"
+            # Busca o CSV atual para anexar
+            res = requests.get(f"{BASE_URL}/{FILENAME}")
+            conteudo = res.text if res.status_code == 200 else "Data,Usuario,Mensagem\n"
+            novo_conteudo = conteudo + f"{timestamp},{usuario},{msg}\n"
 
-                # Upload para o Vercel Blob
-                requests.put(
-                    f"https://blob.vercel-storage.com/{FILENAME}",
-                    data=novo_conteudo.encode('utf-8'),
-                    headers={
-                        "Authorization": f"Bearer {BLOB_TOKEN}",
-                        "x-api-version": "1"
-                    },
-                    params={"addRandomSuffix": "false"}
-                )
+            # Upload para o Vercel Blob
+            requests.put(
+                f"https://blob.vercel-storage.com/{FILENAME}",
+                data=novo_conteudo.encode('utf-8'),
+                headers={
+                    "Authorization": f"Bearer {BLOB_TOKEN}",
+                    "x-api-version": "1"
+                },
+                params={"addRandomSuffix": "false"}
+            )
 
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json')
-                self.end_headers()
-                self.wfile.write(json.dumps({"status": "sucesso"}).encode('utf-8'))
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({"status": "sucesso"}).encode('utf-8'))
 
-            except Exception as e:
-                self.enviar_erro(str(e))
-        else:
-            self.enviar_erro("Rota de postagem nao encontrada", 404)
+        except Exception as e:
+            self.enviar_erro(str(e))
+
 
     def enviar_erro(self, mensagem, código=500):
         self.send_response(código)
