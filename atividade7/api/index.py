@@ -5,12 +5,11 @@ import os, datetime
 app = Flask(__name__)
 
 # O Token   
-BLOB_TOKEN = os.environ.get("vercel_blob_rw_mVnWxuxouhSW7D1h_onOCt4VBGTu2V89GjEc8VdpXLQXK5t")
+BLOB_TOKEN = os.environ.get("BLOB_READ_WRITE_TOKEN")
 # Nome do seu arquivo no storage
 FILENAME = "dados.csv"
 # storage URL base  
-BASE_URL = "BLOB_READ_WRITE_TOKEN"
-
+BASE_URL = "https://mvnwxuxouhsw7d1h.public.blob.vercel-storage.com"
 app = Flask(__name__)
 from flask import Flask, request, jsonify
 import requests
