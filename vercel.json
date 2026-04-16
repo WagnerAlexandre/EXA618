@@ -1,8 +1,13 @@
 {
   "rewrites": [
     {
-      "source": "/atividade7/(.*)",
-      "destination": "/atividade7/api/index.py"
+      "source": "/api/(.*)",
+      "destination": "/api/index.py"
     }
-  ]
+  ],
+  "functions": {
+    "api/index.py": {
+      "runtime": "vercel-python@0.0.6"
+    }
+  }
 }

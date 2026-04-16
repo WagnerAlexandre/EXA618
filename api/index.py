@@ -91,8 +91,3 @@ def listar():
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
 
-def handler(event, context):
-    return app(event, context)
-
-if __name__ == "__main__":
-    app.run(host='0.0.0.0')
