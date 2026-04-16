@@ -16,33 +16,23 @@ class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         # Rota principal pedida: /api/index
         if self.path == '/api/index':
-            self.send_response(200)
-            self.send_header('Content-type', 'text/plain; charset=utf-8')
-            self.end_headers()
-            self.wfile.write("API Atividade 7 via /api/index está Online!".encode('utf-8'))
-
-        # Rota de listagem: /api/index/mensagens ou /api/atividade7/mensagens
-        elif '/mensagens' in self.path:
             file_url = f"{BASE_URL}/{FILENAME}"
-            try:
-                res = requests.get(file_url)
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json')
-                self.end_headers()
 
-                if res.status_code != 200:
-                    response = {"mensagens": []}
-                else:
-                    f = io.StringIO(res.text)
-                    reader = csv.DictReader(f)
-                    response = {"mensagens": list(reader)}
-                
-                self.wfile.write(json.dumps(response).encode('utf-8'))
-            except Exception as e:
-                self.enviar_erro(str(e))
-        
-        else:
-            self.enviar_erro(f"Rota {self.path} nao encontrada", 404)
+            res = requests.get(file_url)
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+
+            if res.status_code != 200:
+                response = {"mensagens": []}
+            else:
+                f = io.StringIO(res.text)
+                reader = csv.DictReader(f)
+                response = {"mensagens": list(reader)}
+            
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+
+
 
     def do_POST(self):
         # Rota de salvamento
